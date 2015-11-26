@@ -21,6 +21,8 @@ public:
 private slots:
     void on_cmdEntrenar_clicked();
 
+    void on_cmdPruebas_clicked();
+
 private:
     Ui::MainWindow *ui;
 

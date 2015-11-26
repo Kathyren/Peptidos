@@ -23,6 +23,9 @@ public:
     RedNeuronal(double[][NUM_SALIDAS],double[][NUM_CARS]);
     void inicializa();
     void entrenar();
+    double sumatoriaW1(double [NUM_CARS][NUM_NEUS_C2], double [NUM_CARS], int);
+    double sumatoriaW2(double [NUM_NEUS_C2][NUM_SALIDAS], double [NUM_NEUS_C2], int);
+    double CambioW2(double*, double*, double*, int);
 };
 
 #endif // REDNEURONAL_H

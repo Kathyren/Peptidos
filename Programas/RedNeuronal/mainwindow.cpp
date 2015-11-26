@@ -56,3 +56,8 @@ void MainWindow::on_cmdEntrenar_clicked()
 
     redNeuronal->entrenar();
 }
+
+void MainWindow::on_cmdPruebas_clicked()
+{
+
+}
