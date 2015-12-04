@@ -35,9 +35,11 @@ public:
     QLineEdit *txtArchivoPrueba;
     QLabel *label_2;
     QPushButton *cmdPruebas;
+    QPushButton *btnCalular;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
+    QToolBar *toolBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -69,6 +71,9 @@ public:
         cmdPruebas = new QPushButton(centralWidget);
         cmdPruebas->setObjectName(QStringLiteral("cmdPruebas"));
         cmdPruebas->setGeometry(QRect(480, 110, 121, 21));
+        btnCalular = new QPushButton(centralWidget);
+        btnCalular->setObjectName(QStringLiteral("btnCalular"));
+        btnCalular->setGeometry(QRect(340, 120, 121, 21));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -80,6 +85,9 @@ public:
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         MainWindow->setStatusBar(statusBar);
+        toolBar = new QToolBar(MainWindow);
+        toolBar->setObjectName(QStringLiteral("toolBar"));
+        MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
         retranslateUi(MainWindow);
 
@@ -90,10 +98,13 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
         cmdEntrenar->setText(QApplication::translate("MainWindow", "Entrenar", 0));
-        txtArchivoEntrenamiento->setText(QApplication::translate("MainWindow", "C:\\Users\\Enrique\\Desktop\\Entrenamiento.txt", 0));
+        txtArchivoEntrenamiento->setText(QApplication::translate("MainWindow", " C:\\Users\\Karen\\Documents\\Peptidos\\RedesNeuronales\\Entrenamiento.txt ", 0));
         label->setText(QApplication::translate("MainWindow", "Datos de Entrenamiento", 0));
+        txtArchivoPrueba->setText(QApplication::translate("MainWindow", " C:\\Users\\Karen\\Documents\\Peptidos\\RedesNeuronales\\Entrenamiento.txt ", 0));
         label_2->setText(QApplication::translate("MainWindow", "Datos de Prueba", 0));
         cmdPruebas->setText(QApplication::translate("MainWindow", "Pruebas", 0));
+        btnCalular->setText(QApplication::translate("MainWindow", "Caluclar", 0));
+        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0));
     } // retranslateUi
 
 };

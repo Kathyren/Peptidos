@@ -23,6 +23,8 @@ private slots:
 
     void on_cmdPruebas_clicked();
 
+    void on_btnCalular_clicked();
+
 private:
     Ui::MainWindow *ui;
 

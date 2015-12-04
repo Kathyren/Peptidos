@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <QtMath>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 RedNeuronal::RedNeuronal(double clases[][NUM_SALIDAS], double datos[][NUM_CARS])
 {
@@ -30,6 +36,29 @@ RedNeuronal::RedNeuronal(double clases[][NUM_SALIDAS], double datos[][NUM_CARS])
     std::cout<<std::endl;
 }
 
+void RedNeuronal:: preProbar(double clases[][NUM_SALIDAS], double datos[][NUM_CARS])
+{
+
+    for (int contE=0; contE<NUM_ENTREN; contE++){
+        for (int contS=0; contS<NUM_SALIDAS; contS++)
+        {
+            clasesPrueba[contE][contS]=clases[contE][contS];
+        }
+        for (int contC=0; contC<NUM_CARS; contC++){
+            datosPrueba[contE][contC]=datos[contE][contC];
+        }
+    }
+}
+void RedNeuronal:: preCalcular( double datos[][NUM_CARS])
+{
+    for (int contE=0; contE<NUM_ENTREN; contE++){
+        for (int contS=0; contS<NUM_CARS; contS++)
+        {
+            datosCalcular[contE][contS]=datos[contE][contS];
+        }
+
+    }
+}
 void RedNeuronal::inicializa()
 {
     for (int contC=0; contC<NUM_CARS; contC++){
@@ -54,13 +83,21 @@ void RedNeuronal::inicializa()
     }
     alfa=0.5;
 }
-
 double f(double x)
 {
     return 1/(1+qPow(2.718,-x));
 }
+bool RedNeuronal::condiciones()
+{
+    for (int i=0; i<NUM_SALIDAS;i++)
+    {
+       if( !condicion(S[i],y[i]))
+           return false;
 
-bool condicion(double S, double y)
+    }
+    return true;
+}
+bool RedNeuronal::condicion(double S, double y)
 {
     //Falta generalizar
     if (qAbs(S-y)<EPSILON)
@@ -68,7 +105,6 @@ bool condicion(double S, double y)
     else
         return false;
 }
-
 void RedNeuronal::entrenar(){
     inicializa();
     int epoca=0;
@@ -80,6 +116,7 @@ void RedNeuronal::entrenar(){
         std::cout<<"----------------------------------------------------------------------------------------"<<std::endl;
         for (int contE=0; contE<NUM_ENTREN; contE++)
         {
+
             for (int contC=0; contC<NUM_CARS; contC++)
             {
                 x[contC]=datosEntren[contE][contC];
@@ -102,7 +139,7 @@ void RedNeuronal::entrenar(){
                      <<" w1="<<w1[0][0]<<" w1="<<w1[1][0]<<" w2="<<w2[0][0]
                      <<" u2="<<u2[0]<<" u3="<<u3[0]<<" "<<std::endl;
 
-            if (!condicion(S[0],y[0]))
+            if (!condiciones())
             {
 
                 //w1[0][0]=w1[0][0]+(S[0]-y[0])*y[0]*(1-y[0])*w2[0][0]*a2[0]*(1-a2[0])*x[0]*alfa;
@@ -173,10 +210,10 @@ double RedNeuronal:: sumatoriaW1(double w1 [NUM_CARS][NUM_NEUS_C2], double x [NU
 
 
 }
-
 double RedNeuronal:: sumatoriaW2 (double w2 [NUM_NEUS_C2][NUM_SALIDAS], double a2[NUM_NEUS_C2], int numeronaSalida)
 {
     double r;
+    //double err=0;
     r=0;
     for (int i=0; i<NUM_NEUS_C2;i++)
     {
@@ -188,6 +225,127 @@ double RedNeuronal:: sumatoriaW2 (double w2 [NUM_NEUS_C2][NUM_SALIDAS], double a
     return r;
 
 }
+double RedNeuronal::probar(double clases[][NUM_SALIDAS], double datos[][NUM_CARS]){
+
+    for (int contE=0; contE<NUM_Pruebas; contE++){
+        for (int contS=0; contS<NUM_SALIDAS; contS++)
+        {
+            clasesPrueba[contE][contS]=clases[contE][contS];
+        }
+        for (int contC=0; contC<NUM_CARS; contC++){
+            datosPrueba[contE][contC]=datos[contE][contC];
+        }
+    }
+
+    for (int contE=0; contE<NUM_Pruebas; contE++){
+        std::cout<<std::endl;
+        for (int contS=0; contS<NUM_SALIDAS; contS++)
+        {
+            std::cout<<clasesPrueba[contE][contS]<<" ";
+        }
+        std::cout<<" - ";
+        for (int contC=0; contC<NUM_CARS; contC++){
+            std::cout<<(int)datosPrueba[contE][contC]<<" ";
+        }
+    }
+    std::cout<<std::endl;
+    double err = 0;
+
+        std::cout<<"----------------------------------------------------------------------------------------"<<std::endl;
+        for (int contE=0; contE<NUM_Pruebas; contE++)
+        {
+            for (int contC=0; contC<NUM_CARS; contC++)
+            {
+                x[contC]=datosPrueba[contE][contC];
+            }
+            for (int contS=0; contS<NUM_SALIDAS; contS++)
+            {
+                S[contS]=clasesPrueba[contE][contS];
+            }
+
+            //A partir de aquí falta generalizar
+            for (int i=0; i<NUM_NEUS_C2; i++)
+            {
+            a2[i]=f(u2[i]+sumatoriaW1(w1,x,i));
+            }
+            for (int i=0; i<NUM_SALIDAS; i++)
+            y[i]=f(u3[i]+ sumatoriaW2(w2,a2,i));
+            for (int i=0; i<NUM_SALIDAS; i++)
+            {
+            std::cout<<"Valor: "<<contE
+                     <<"S="<<S[i]<<" y="<<y[i]<<" "<<std::endl;
+
+
+            }
+            if(!condiciones())
+            {
+                err++;
+            }
+
+
+        }
+
+
+        std::cout
+                 <<"Se equivoco en;  "<<err<<std::endl;
+        return err;
+
+}
+QString RedNeuronal::Resultado( double datos[][NUM_CARS])
+{
+   QString texto="";
+    for (int contE=0; contE<NUM_Calculos; contE++)
+    {
+
+        for (int contC=0; contC<NUM_CARS; contC++)
+        {
+            datosCalcular [contE][contC]=datos[contE][contC];
+        }
+
+    }
+    std::cout<<std::endl;
+
+
+
+  std::cout<<"----------------------------------------------------------------------------------------"<<std::endl;
+        for (int contE=0; contE<NUM_Calculos; contE++)
+        {
+            for (int contC=0; contC<NUM_CARS; contC++)
+            {
+                x[contC]=datosCalcular[contE][contC];
+            }
+
+
+
+            for (int i=0; i<NUM_NEUS_C2; i++)
+            {
+            a2[i]=f(u2[i]+sumatoriaW1(w1,x,i));
+            }
+            for (int i=0; i<NUM_SALIDAS; i++)
+            {y[i]=f(u3[i]+ sumatoriaW2(w2,a2,i));
+            }
+            for(int i=0;i<NUM_SALIDAS;i=i+1)
+                {
+
+                    texto+=QString::number(y[i]);
+                    texto+=" ";
+                    std::cout<<"Valor: "<<contE
+                             <<"="<<i<<"    y="<<y[i]<<" "<<std::endl;
+
+
+                }
+
+            texto+="\n";
+
+        }
+
+
+
+
+return texto;
+
+}
+
 /*double RedNeuronal :: CambioW2(double s[NUM_SALIDAS], double y[NUM_SALIDAS], double a2[NUM_NEUS_C2], int NumW )
 {
     double valor= 0;
